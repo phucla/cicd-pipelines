@@ -9,27 +9,20 @@ jobs:
   print-hello:
     docker:
       - image: circleci/node:13.8.0
-    branches:
-      only:
-        - master
     steps:
       - checkout
       - run:
-        name: print hello command
-        command: |
-          - echo "hello job 1"
+          name: print hello command
+          command: "echo Hello!"
   print-world:
     docker:
       - image: circleci/node:13.8.0
-    branches:
-      only:
-        - master
     steps:
       - checkout
       - run:
-        name: print world command
-        command: |
-          - echo "hello world"
+          name: print world command
+          command: "echo Hello, World!"
+
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
