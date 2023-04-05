@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run:
           name: print hello command
-          command: "echo Hello!"
+          command: echo ${MY_NAME_VAR}
   print-world:
     docker:
       - image: circleci/node:13.8.0
