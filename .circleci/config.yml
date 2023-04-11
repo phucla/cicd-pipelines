@@ -63,13 +63,18 @@ jobs:
           name: print world command
           command: echo $MY_NAME_VAR
 
+  create_infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+        name: Create Cloudformation Stack
+        command:
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
   welcome:
     # Run the print_hello job in its own container
     jobs:
-      - print_pipeline
-      - save_hello_world_output
-      - print_output_file:
-          requires: [save_hello_world_output]
+      - create_infrastructure
