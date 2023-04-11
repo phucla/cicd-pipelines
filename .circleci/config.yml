@@ -69,12 +69,17 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Create Cloudformation Stack
-        command: aws cloudformation deploy \ --template-file template.yml \ --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \ --region us-east-1
+          name: Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy \
+              --template-file template.yml \
+              --stack-name myStack \
+              --region us-east-1
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
   welcome:
     # Run the print_hello job in its own container
     jobs:
+      - save_hello_world_output
       - create_infrastructure
