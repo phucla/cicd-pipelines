@@ -4,6 +4,7 @@ version: 2.1
 orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
+  slack: circleci/slack@4.1
 
 commands:
   sayhello:
@@ -27,6 +28,27 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5}
 jobs:
+  notify:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*This is a text notification*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
+          event: always
   print_pipeline:
     docker:
       - image: circleci/node:13.8.0
@@ -83,6 +105,7 @@ jobs:
               --template-file template.yml \
               --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region us-east-1
+      - destroy_environment
 
   update_inventory:
     docker:
@@ -201,21 +224,22 @@ workflows:
     # Run the print_hello job in its own container
     jobs:
       - save_hello_world_output
-      - create_infrastructure
-      - update_inventory:
-          requires:
-            - create_infrastructure
-      - configure_infrastructure:
-          requires:
-            - update_inventory
-      - create_and_deploy_front_end
-      - promote_to_production:
-          requires:
-            - create_and_deploy_front_end
-      - get_last_deployment_id:
-          requires:
-            - promote_to_production
-      - clean_up_old_front_end:
-          requires:
-            - get_last_deployment_id
-            - promote_to_production
+      - notify
+      # - create_infrastructure
+      # - update_inventory:
+      #     requires:
+      #       - create_infrastructure
+      # - configure_infrastructure:
+      #     requires:
+      #       - update_inventory
+      # - create_and_deploy_front_end
+      # - promote_to_production:
+      #     requires:
+      #       - create_and_deploy_front_end
+      # - get_last_deployment_id:
+      #     requires:
+      #       - promote_to_production
+      # - clean_up_old_front_end:
+      #     requires:
+      #       - get_last_deployment_id
+      #       - promote_to_production
