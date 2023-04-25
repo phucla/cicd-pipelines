@@ -7,6 +7,64 @@ orbs:
   slack: circleci/slack@4.1
 
 commands:
+  slack_notification:
+    description: "Slack notification"
+    steps:
+      - slack/notify:
+          custom: |
+            {
+              "attachments": [
+                {
+                  "color": "#d50054",
+                  "blocks": [
+                    {
+                      "type": "header",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Your build is FAILED",
+                        "emoji": true
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "Build *${CIRCLE_BUILD_NUM}* is failed. Job is ${CIRCLE_JOB} as here: ${CIRCLE_BUILD_URL}"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          event: fail
+
+      - slack/notify:
+          event: pass
+          custom: |
+            {
+              "attachments": [
+                {
+                  "color": "#00d581",
+                  "blocks": [
+                    {
+                      "type": "header",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Your build is PASSED",
+                        "emoji": true
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "Build *${CIRCLE_BUILD_NUM}* is PASSED as here: ${CIRCLE_BUILD_URL}"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
   sayhello:
     description: "A very simple command for demonstration purposes"
     parameters:
@@ -68,6 +126,7 @@ jobs:
           root: ~/
           paths:
             - output.txt
+      - slack_notification
   print_output_file:
     docker:
       - image: circleci/node:13.8.0
